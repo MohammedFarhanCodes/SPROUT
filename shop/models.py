@@ -15,7 +15,7 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    price = models.IntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.IntegerField(default=1)
     discount = models.FloatField(default=0)
     image = models.URLField(blank=True, null=True)
@@ -36,6 +36,14 @@ class Cart(models.Model):
     @property
     def cart_count(self):
         return self.items.count()  # Return the number of items in the cart
+
+    @property
+    def sub_total(self):
+        total = 0
+        for item in self.items.all():
+            total += item.quantity * item.product.price
+        return total
+
 
 
 class CartItem(models.Model):

@@ -55,12 +55,19 @@
             <nav id="navmenu" class="navmenu">
                 <ul>
                     <li><a href="{% url 'index' %}#hero" class="active">Home</a></li>
-                    <li><a href="{% url 'shop:shop' %}">Shop</a></li>
-                    <li><a href="{% url 'shop:cart' %}">Cart <span
-                            class="badge bg-secondary rounded-circle">3</span></a></li>
                     <li><a href="{% url 'index' %}#about">About</a></li>
 
                     <li><a href="{% url 'index' %}#contact">Contact</a></li>
+                    <li><a href="{% url 'shop:shop' %}">Shop</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'shop:cart' %}">Cart <span
+                                class="badge bg-secondary rounded-circle cart-count">{{ user.cart.cart_count }}</span></a></li>
+                        <li>
+                            <a href="{% url 'main:dashboard' %}">Dashboard</a>
+                        </li>
+                        {% else %}
+                        <a href="{% url 'accounts:login' %}">Get started</a>
+                    {% endif %}
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>

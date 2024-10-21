@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'main',
     'accounts',
     'shop',
+    'wallet',
     'django_cleanup'
 ]
 

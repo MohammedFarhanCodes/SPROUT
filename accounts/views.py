@@ -3,6 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from .decorators import redirect_if_authenticated
 from .models import UserProfile, User
+from wallet.models import Wallet
 
 
 @redirect_if_authenticated
@@ -57,6 +58,7 @@ def registerView(request):
             user=user
         )
         up.save()
+        Wallet.objects.create(user=user)
         login(request, user)
         return redirect('main:dashboard')
     return render(request, 'accounts/register.html')
@@ -65,3 +67,6 @@ def registerView(request):
 def logoutView(request):
     logout(request)
     return redirect('accounts:login')
+
+
+
