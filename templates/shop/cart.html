@@ -117,11 +117,12 @@
                                     <span><strong>AED {{ user.cart.sub_total }}</strong></span>
                                 </li>
                             </ul>
-
+                            {% if user.cart.items.exists %}
                             <button type="button" data-mdb-button-init data-mdb-ripple-init
                                     class="btn btn-dark btn-block" onclick="location.href=`{% url 'shop:checkout' %}`">
                                 Go to checkout
                             </button>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

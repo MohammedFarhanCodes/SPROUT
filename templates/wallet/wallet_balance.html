@@ -44,38 +44,29 @@
         <div class="row my-4">
             <div class="col-md-12">
                 <h5>Transaction History</h5>
-                <table class="table table-hover">
+                <table class="table table-hover text-capitalize">
                     <thead class="table-light">
                     <tr>
                         <th>#</th>
                         <th>Date</th>
-                        <th>Description</th>
+                        <th>Type</th>
+                        <th>Account</th>
                         <th>Amount</th>
                         <th>Status</th>
                     </tr>
                     </thead>
                     <tbody>
+                    {% for t in user.wallet.transactions.all %}
                     <tr>
-                        <td>1</td>
-                        <td>2024-10-20</td>
-                        <td>Round-up Savings</td>
-                        <td>AED 5.50</td>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ t.created_at|date:'Y-m-d' }}</td>
+                        <td>{{ t.transaction_type }}</td>
+                        <td>{{ t.account }}</td>
+                        <td>AED {{ t.amount }}</td>
                         <td><span class="badge bg-success">Completed</span></td>
                     </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>2024-10-18</td>
-                        <td>Investment</td>
-                        <td>AED -100.00</td>
-                        <td><span class="badge bg-success">Completed</span></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>2024-10-15</td>
-                        <td>Add Funds</td>
-                        <td>AED 200.00</td>
-                        <td><span class="badge bg-warning text-dark">Pending</span></td>
-                    </tr>
+                    {% endfor %}
+                    
                     </tbody>
                 </table>
             </div>
@@ -84,7 +75,7 @@
         <!-- Additional Actions -->
         <div class="row my-4">
             <div class="col-md-12 text-center">
-                <button class="btn btn-outline-primary">View More Transactions</button>
+                <button class="btn btn-outline-primary" onclick="location.href=`{% url 'wallet:transactions' %}`">View More Transactions</button>
             </div>
         </div>
     </div>

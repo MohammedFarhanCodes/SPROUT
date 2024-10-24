@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <h1>{{ symbol }} Stock Price (Last Month)</h1>
+    <div class="col-10 m-auto">
+    <canvas id="stockChart"></canvas>
+    <button class="btn btn-success">Buy</button>
+    <button class="btn btn-danger">Sell</button>
+    </div>
+
+
+    <script>
+        const ctx = document.getElementById('stockChart').getContext('2d');
+        const stockChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ dates|safe }},  // Dates as X-axis labels
+                datasets: [{
+                    label: '{{ symbol }} Closing Prices',
+                    data: {{ prices|safe }},  // Prices as Y-axis values
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Price (AED)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 # Create your models here.
 
 class Category(models.Model):
@@ -45,7 +46,6 @@ class Cart(models.Model):
         return total
 
 
-
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -58,3 +58,26 @@ class CartItem(models.Model):
     def total_price(self):
         return self.quantity * self.product.price
 
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def sub_total(self):
+        total = 0
+        for item in self.orderitem_set.all():
+            total += item.quantity * item.product.price
+        return total
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+
+    @property
+    def total_price(self):
+        return self.quantity * self.product.price

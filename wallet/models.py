@@ -15,12 +15,13 @@ class Wallet(models.Model):
     def __str__(self):
         return f"Wallet of {self.user}"
 
-    def add_transaction(self, amount, transaction_type, description=None):
+    def add_transaction(self, amount, transaction_type, description=None, account=None):
         Transaction.objects.create(
             wallet=self,
             amount=amount,
             transaction_type=transaction_type,
-            description=description
+            description=description,
+            account=account
         )
 
 
@@ -29,11 +30,13 @@ class Transaction(models.Model):
         ('deposit', 'Deposit'),
         ('withdrawal', 'Withdrawal'),
         ('transfer', 'Transfer'),
+        ('payment', 'Payment')
     ]
 
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name='transactions')
     transaction_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    account = models.CharField(max_length=50, blank=True, null=True)
     transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPES)
     description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

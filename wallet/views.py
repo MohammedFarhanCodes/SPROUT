@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Wallet
+from .models import Wallet, Transaction
 from decimal import Decimal
 
 
@@ -20,10 +20,23 @@ def transfer_balance(request):
         if f == 'savings' and Decimal(amount) <= wallet.savings_balance:
             wallet.savings_balance -= amount
             wallet.investment_balance += amount
+            wallet.add_transaction(
+                amount=amount,
+                transaction_type='Transfer',
+                account='Savings -> Current'
+            )
         elif f == 'current' and Decimal(amount) <= wallet.investment_balance:
             wallet.investment_balance -= amount
             wallet.savings_balance += amount
+            wallet.add_transaction(
+                amount=amount,
+                transaction_type='Transfer',
+                account='Current -> Savings'
+            )
         wallet.save()
     return redirect('wallet:wallet_balance')
 
 
+def transaction_history(request):
+    t = Transaction.objects.filter(wallet=request.user.wallet)
+    return render(request, 'wallet/transactions.html', {'transactions': t})

@@ -1,5 +1,9 @@
+from decimal import Decimal
+
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product, Cart, CartItem
+
+from wallet.models import Wallet
+from .models import Product, Cart, CartItem, Order, OrderItem
 from django.http import JsonResponse
 
 
@@ -85,5 +89,54 @@ def delete_cart_item(request, item_id):
     item.delete()
     return redirect('shop:cart')
 
+
 def checkout(request):
+    if request.method == 'POST':
+        wallet = Wallet.objects.get(user=request.user)
+        user_cart = Cart.objects.get(user=request.user)
+        total_price = 0
+
+        order = Order.objects.create(
+            user=request.user,
+        )
+        order.save()
+
+        for item in user_cart.items.all():
+            total_price += item.total_price
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity
+            )
+        payment_method = request.POST.get('payment_method')
+        if payment_method == 'current' and wallet.investment_balance >= total_price:
+            wallet.investment_balance -= Decimal(total_price)
+            wallet.save()
+            wallet.add_transaction(
+                amount=total_price,
+                transaction_type="payment",
+                account='Current'
+            )
+            return redirect('shop:success')
+        elif payment_method == 'savings' and wallet.savings_balance >= total_price:
+            wallet.savings_balance -= Decimal(total_price)
+            wallet.save()
+            wallet.add_transaction(
+                amount=total_price,
+                transaction_type="payment",
+                account='Savings'
+            )
+            return redirect('shop:success')
+        elif payment_method == 'stripe':
+            pass
+
     return render(request, 'shop/checkout.html')
+
+
+def success(request):
+    request.user.cart.items.all().delete()
+    return render(request, 'shop/success.html')
+
+
+def failed(request):
+    return render(request, 'shop/failed.html')
