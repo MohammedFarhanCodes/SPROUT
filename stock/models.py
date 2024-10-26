@@ -1,4 +1,5 @@
 # models.py
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -15,3 +16,54 @@ class Stock(models.Model):
         return self.symbol
 
 
+class Investment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    stock_symbol = models.OneToOneField(Stock, on_delete=models.CASCADE)
+    shares = models.DecimalField(max_digits=10, decimal_places=5)
+    purchase_price = models.DecimalField(max_digits=10, decimal_places=2)
+    invested_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    purchase_date = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def get_shares_value(self):
+        return f"{self.shares * self.stock_symbol.current_price:.2f}"
+
+    def buy_more_shares(self, additional_amount, additional_price):
+        additional_shares = additional_amount / additional_price
+        self.invested_amount += additional_amount
+        self.shares += additional_shares
+        # Calculate the new weighted average purchase price
+        self.purchase_price = self.invested_amount / self.shares
+        self.save()
+        return
+
+    def sell_shares(self, shares, current_price):
+        amount = shares * current_price
+        self.invested_amount -= amount
+        self.shares -= shares
+        self.save()
+        self.user.wallet.investment_balance += amount
+        self.user.wallet.save()
+        profit = (shares * current_price) - (shares * self.purchase_price)
+        Profit.objects.create(
+            stock=self.stock_symbol,
+            user=self.user,
+            amount=profit
+        )
+        return
+
+
+class InvestmentTransaction(models.Model):
+    investment = models.ForeignKey(Investment, related_name='transactions', on_delete=models.CASCADE)
+    shares = models.DecimalField(max_digits=10, decimal_places=5)
+    purchase_price = models.DecimalField(max_digits=10, decimal_places=2)  # Individual purchase price
+    invested_amount = models.DecimalField(max_digits=10, decimal_places=2)  # Amount invested in this transaction
+    transaction_type = models.CharField(max_length=20, default="Buy")
+    purchase_date = models.DateTimeField(auto_now_add=True)
+
+
+class Profit(models.Model):
+    stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)

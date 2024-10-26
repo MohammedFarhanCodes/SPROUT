@@ -5,7 +5,8 @@ from decimal import Decimal
 
 # Create your views here.
 def wallet_balance(request):
-    return render(request, 'wallet/wallet_balance.html')
+    transactions = Transaction.objects.filter(wallet=request.user.wallet).order_by('-created_at')[:5]
+    return render(request, 'wallet/wallet_balance.html', {'transactions': transactions})
 
 
 def transfer_balance(request):
@@ -38,5 +39,9 @@ def transfer_balance(request):
 
 
 def transaction_history(request):
-    t = Transaction.objects.filter(wallet=request.user.wallet)
+    t = Transaction.objects.filter(wallet=request.user.wallet).order_by('-created_at')
     return render(request, 'wallet/transactions.html', {'transactions': t})
+
+
+def goal(request):
+    return render(request, 'wallet/savings goal.html')

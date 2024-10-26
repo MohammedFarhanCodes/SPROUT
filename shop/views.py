@@ -10,12 +10,13 @@ from django.http import JsonResponse
 # Create your views here.
 
 def shop(request):
-    products = Product.objects.all()
-    user_cart = Cart.objects.filter(user=request.user)
     cart_item_ids = []
-    if user_cart.exists():
-        for item in user_cart.first().items.all():
-            cart_item_ids.append(item.product_id)
+    products = Product.objects.all()
+    if request.user.is_authenticated:
+        user_cart = Cart.objects.filter(user=request.user)
+        if user_cart.exists():
+            for item in user_cart.first().items.all():
+                cart_item_ids.append(item.product_id)
     context = {
         'products': products,
         'cart_item_ids': cart_item_ids
@@ -24,12 +25,13 @@ def shop(request):
 
 
 def product(request, prod_id):
-    prod = Product.objects.get(id=prod_id)
-    user_cart = Cart.objects.filter(user=request.user)
     cart_item_ids = []
-    if user_cart.exists():
-        for item in user_cart.first().items.all():
-            cart_item_ids.append(item.product_id)
+    prod = Product.objects.get(id=prod_id)
+    if request.user.is_authenticated:
+        user_cart = Cart.objects.filter(user=request.user)
+        if user_cart.exists():
+            for item in user_cart.first().items.all():
+                cart_item_ids.append(item.product_id)
     context = {
         'product': prod,
         'cart_item_ids': cart_item_ids

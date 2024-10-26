@@ -5,6 +5,7 @@ app_name = 'wallet'
 urlpatterns = [
     path('', views.wallet_balance, name="wallet_balance"),
     path('transfer_balance/', views.transfer_balance, name="transfer_balance"),
-    path('transactions/', views.transaction_history, name="transactions")
+    path('transactions/', views.transaction_history, name="transactions"),
+    path('savings_goal/', views.goal, name='savings_goal')
 
 ]

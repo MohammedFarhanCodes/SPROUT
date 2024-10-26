@@ -24,6 +24,12 @@ class Wallet(models.Model):
             account=account
         )
 
+    def get_monthly_profit(self):
+        total = 0
+        for item in self.user.profit_set.all():
+            total += item.amount
+        return total
+
 
 class Transaction(models.Model):
     TRANSACTION_TYPES = [
