@@ -44,8 +44,16 @@
         <p>Thanks for your purchase.</p>
         <table class="table table-borderless">
             <tr>
+                <td style="width: 50%">Total price:</td>
+                <td> AED {{ request.session.total_price }}</td>
+            </tr>
+            <tr>
+                <td style="width: 50%">Roundup amount:</td>
+                <td> AED {{ request.session.roundup_amount }}</td>
+            </tr>
+            <tr>
                 <td style="width: 50%">Amount paid:</td>
-                <td> AED {{ user.order_set.last.sub_total }}</td>
+                <td> AED {{ request.session.roundup_price }}</td>
             </tr>
             <tr>
                 <td>Date & Time:</td>

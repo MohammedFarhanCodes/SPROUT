@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% block title %}My Stock{% endblock %}
 {% block content %}
     {% if user.investment_set %}
          <table class="table">
@@ -34,5 +34,7 @@
             You do not have any stocks yet.
         </div>
     {% endif %}
-
+<script>
+    document.getElementById('user_stocks').classList.add('active')
+    </script>
 {% endblock %}

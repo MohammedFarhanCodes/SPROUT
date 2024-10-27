@@ -43,8 +43,8 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item active">
-                <a class="nav-link" href="{% url 'main:dashboard' %}">
+            <li class="nav-item" id="dashboard">
+                <a class="nav-link" href="{% url 'main:dashboard' %}" >
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
@@ -58,15 +58,15 @@
             </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="{% url 'wallet:wallet_balance' %}">
+            <li class="nav-item" id="balance">
+                <a class="nav-link collapsed" href="{% url 'wallet:wallet_balance' %}" >
                     <i class="fas fa-fw fa-wallet"></i>
                     <span>Balance</span>
                 </a>
                 
             </li>
             
-            <li class="nav-item">
+            <li class="nav-item" id="goal">
                 <a class="nav-link collapsed" href="{% url 'wallet:savings_goal' %}">
                     <i class="fas fa-fw fa-wallet"></i>
                     <span>Savings goal</span>
@@ -75,7 +75,7 @@
             </li>
 
             <!-- Nav Item - Utilities Collapse Menu -->
-            <li class="nav-item">
+            <li class="nav-item" id="transactions">
                 <a class="nav-link collapsed" href="{% url 'wallet:transactions' %}">
                     <i class="fas fa-fw fa-credit-card"></i>
                     <span>Transactions</span>
@@ -93,14 +93,14 @@
             
 
             <!-- Nav Item - Charts -->
-            <li class="nav-item">
+            <li class="nav-item" id="user_stocks">
                 <a class="nav-link" href="{% url 'stock:user_stocks' %}">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>My Stocks</span></a>
             </li>
 
             <!-- Nav Item - Tables -->
-            <li class="nav-item">
+            <li class="nav-item" id="stock_list">
                 <a class="nav-link" href="{% url 'stock:stock_list' %}">
                     <i class="fas fa-fw fa-table"></i>
                     <span>Available Stocks</span></a>

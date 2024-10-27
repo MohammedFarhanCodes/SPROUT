@@ -52,7 +52,7 @@
                                             <div class="d-flex mb-4" style="max-width: 300px">
                                                 <button data-mdb-button-init data-mdb-ripple-init
                                                         class="btn btn-dark px-3 me-2"
-                                                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                                        onclick="location.href=`{% url 'shop:item_minus' item.id %}`">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
 
@@ -63,7 +63,7 @@
 
                                                 <button data-mdb-button-init data-mdb-ripple-init
                                                         class="btn btn-dark px-3 ms-2"
-                                                        onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                                                        onclick="location.href=`{% url 'shop:item_plus' item.id %}`">
                                                     <i class="fas fa-plus"></i>
                                                 </button>
                                             </div>
@@ -71,7 +71,7 @@
 
                                             <!-- Price -->
                                             <p class="text-start text-md-center">
-                                                <strong>AED {{ item.product.price }}</strong>
+                                                <strong>AED {{ item.total_price }}</strong>
                                             </p>
                                             <!-- Price -->
                                         </div>

@@ -330,9 +330,13 @@
 
         </div>
     </div>
+    
 {% endblock %}
 {% block scripts %}
-<!-- Page level plugins -->
+    <script>
+    document.getElementById('dashboard').classList.add('active')
+    </script>
+    <!-- Page level plugins -->
     <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>
 
     <!-- Page level custom scripts -->

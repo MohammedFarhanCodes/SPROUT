@@ -18,7 +18,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.IntegerField(default=1)
-    discount = models.FloatField(default=0)
+    discount = models.DecimalField(decimal_places=2, max_digits=10, default=0)
     image = models.URLField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -26,6 +26,12 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def get_price(self):
+        if self.discount != 0:
+            return self.price - (self.price * self.discount / 100)
+        return self.price
 
 
 class Cart(models.Model):
@@ -42,7 +48,7 @@ class Cart(models.Model):
     def sub_total(self):
         total = 0
         for item in self.items.all():
-            total += item.quantity * item.product.price
+            total += item.quantity * item.product.get_price
         return total
 
 
@@ -56,7 +62,7 @@ class CartItem(models.Model):
 
     @property
     def total_price(self):
-        return self.quantity * self.product.price
+        return self.quantity * self.product.get_price
 
 
 class Order(models.Model):

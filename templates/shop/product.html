@@ -27,11 +27,11 @@
                 </div>
                 <hr>
                 <div class="text-primary bold h2">
-                    AED  {{ product.price }}
+                    AED  {{ product.get_price }}
                 </div>
                 <div class="wrap">
-                    <span class="text-secondary text-decoration-line-through ">AED  50</span>
-                    <span class="text-secondary ">-40%</span>
+                    <span class="text-secondary text-decoration-line-through ">AED {{ product.price }}</span>
+                    <span class="text-secondary ">-{{ product.discount }}%</span>
                 </div>
 
                 <div class="wrap">

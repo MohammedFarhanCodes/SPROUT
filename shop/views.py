@@ -1,3 +1,4 @@
+import math
 from decimal import Decimal
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -87,9 +88,25 @@ def add_to_cart(request, prod_id=None):
 
 
 def delete_cart_item(request, item_id):
-    item = CartItem.objects.get(id=item_id)
+    item = CartItem.objects.get(id=item_id, cart__user=request.user)
     item.delete()
     return redirect('shop:cart')
+
+
+def item_plus(request, prod_id):
+    item = CartItem.objects.get(id=prod_id, cart__user=request.user)
+    item.quantity += 1
+    item.save()
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+def item_minus(request, prod_id):
+    item = CartItem.objects.get(id=prod_id, cart__user=request.user)
+    item.quantity -= 1
+    item.save()
+    if item.quantity == 0:
+        item.delete()
+    return redirect(request.META.get('HTTP_REFERER'))
 
 
 def checkout(request):
@@ -110,25 +127,27 @@ def checkout(request):
                 product=item.product,
                 quantity=item.quantity
             )
+        roundup_price = math.ceil(total_price)
+        roundup_amount = roundup_price - total_price
         payment_method = request.POST.get('payment_method')
         if payment_method == 'current' and wallet.investment_balance >= total_price:
-            wallet.investment_balance -= Decimal(total_price)
+            wallet.investment_balance -= Decimal(roundup_price)
             wallet.save()
             wallet.add_transaction(
-                amount=total_price,
+                amount=roundup_price,
                 transaction_type="payment",
                 account='Current'
             )
-            return redirect('shop:success')
-        elif payment_method == 'savings' and wallet.savings_balance >= total_price:
-            wallet.savings_balance -= Decimal(total_price)
-            wallet.save()
             wallet.add_transaction(
-                amount=total_price,
-                transaction_type="payment",
-                account='Savings'
+                amount=roundup_amount,
+                transaction_type="Roundup",
+                account='Current'
             )
+            request.session['roundup_amount'] = float(roundup_amount)
+            request.session['total_price'] = float(total_price)
+            request.session['roundup_price'] = float(roundup_price)
             return redirect('shop:success')
+
         elif payment_method == 'stripe':
             pass
 

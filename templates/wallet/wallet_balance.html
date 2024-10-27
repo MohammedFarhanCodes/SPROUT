@@ -57,16 +57,16 @@
                     </thead>
                     <tbody>
                     {% for t in transactions %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ t.created_at|date:'Y-m-d' }}</td>
-                        <td>{{ t.transaction_type }}</td>
-                        <td>{{ t.account }}</td>
-                        <td>AED {{ t.amount }}</td>
-                        <td><span class="badge bg-success">Completed</span></td>
-                    </tr>
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ t.created_at|date:'Y-m-d' }}</td>
+                            <td>{{ t.transaction_type }}</td>
+                            <td>{{ t.account }}</td>
+                            <td>AED {{ t.amount }}</td>
+                            <td><span class="badge bg-success">Completed</span></td>
+                        </tr>
                     {% endfor %}
-                    
+
                     </tbody>
                 </table>
             </div>
@@ -75,7 +75,9 @@
         <!-- Additional Actions -->
         <div class="row my-4">
             <div class="col-md-12 text-center">
-                <button class="btn btn-outline-primary" onclick="location.href=`{% url 'wallet:transactions' %}`">View More Transactions</button>
+                <button class="btn btn-outline-primary" onclick="location.href=`{% url 'wallet:transactions' %}`">View
+                    More Transactions
+                </button>
             </div>
         </div>
     </div>
@@ -155,26 +157,31 @@
             integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
             crossorigin="anonymous"></script>
     <script>
-    $(document).ready(function() {
-        $('#from').change(function() {
-            if ($(this).val() === 'savings') {
-                $('#to').val('current');
-            } else {
-                $('#to').val('savings');
-            }
-        });
+        document.getElementById('balance').classList.add('active')
+    </script>
+    <script>
 
-        $('#to').change(function() {
-            if ($(this).val() === 'savings') {
-                $('#from').val('current');
-            } else {
-                $('#from').val('savings');
-            }
+        $(document).ready(function () {
+            $('#from').change(function () {
+                if ($(this).val() === 'savings') {
+                    $('#to').val('current');
+                } else {
+                    $('#to').val('savings');
+                }
+            });
+
+            $('#to').change(function () {
+                if ($(this).val() === 'savings') {
+                    $('#from').val('current');
+                } else {
+                    $('#from').val('savings');
+                }
+            });
+
+            $('#submit-btn').click(function () {
+                $('#transfer_form').submit()
+            })
         });
-        
-        $('#submit-btn').click(function (){
-            $('#transfer_form').submit()
-        })
-    });
-</script>
+    </script>
+
 {% endblock %}

@@ -85,14 +85,7 @@
                                     Please provide a valid emirate.
                                 </div>
                             </div>
-
-                            <div class="col-md-3">
-                                <label for="zip" class="form-label">Postal Code</label>
-                                <input type="text" class="form-control" id="zip" name="zip" required>
-                                <div class="invalid-feedback">
-                                    Postal code required.
-                                </div>
-                            </div>
+                            
 
                         </div>
 
@@ -117,7 +110,6 @@
                             <select name="payment_method" id="" class="form-select">
                                 <option value="stripe">Stripe</option>
                                 <option value="current">Current account (AED {{ user.wallet.investment_balance }})</option>
-                                <option value="savings">Savings account (AED {{ user.wallet.savings_balance }})
                                 </option>
                             </select>
                         </div>
