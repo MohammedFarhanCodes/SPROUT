@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.shortcuts import render, get_object_or_404, redirect
 
+from stock.models import Stock, Investment, InvestmentTransaction
 from wallet.models import Wallet
 from .models import Product, Cart, CartItem, Order, OrderItem
 from django.http import JsonResponse
@@ -113,6 +114,7 @@ def checkout(request):
     if request.method == 'POST':
         wallet = Wallet.objects.get(user=request.user)
         user_cart = Cart.objects.get(user=request.user)
+        pay_extra = request.POST.get('pay_extra')
         total_price = 0
 
         order = Order.objects.create(
@@ -127,7 +129,11 @@ def checkout(request):
                 product=item.product,
                 quantity=item.quantity
             )
-        roundup_price = math.ceil(total_price)
+        if pay_extra == "roundup_balance":
+            roundup_price = math.ceil(total_price)
+        else:
+            percentage = request.POST.get('percentage')
+            roundup_price = total_price + (total_price * Decimal(percentage) / 100)
         roundup_amount = roundup_price - total_price
         payment_method = request.POST.get('payment_method')
         if payment_method == 'current' and wallet.investment_balance >= total_price:
@@ -138,11 +144,43 @@ def checkout(request):
                 transaction_type="payment",
                 account='Current'
             )
-            wallet.add_transaction(
-                amount=roundup_amount,
-                transaction_type="Roundup",
-                account='Current'
-            )
+            pay_extra_for = request.POST.get('pay_extra_for')
+            if pay_extra_for == 'savings':
+                wallet.savings_balance += roundup_amount
+                wallet.add_transaction(
+                    amount=roundup_amount,
+                    transaction_type="Roundup",
+                    account='Savings'
+                )
+                wallet.save()
+            else:
+                stock_id = request.POST.get('selected_stock')
+                selected_stock = Stock.objects.get(id=stock_id)
+                shares = roundup_amount / selected_stock.current_price
+                temp = Investment.objects.filter(stock_symbol=selected_stock)
+                if temp.exists():
+                    temp.first().buy_more_shares(roundup_amount, selected_stock.current_price)
+                else:
+                    Investment.objects.get_or_create(
+                        user=request.user,
+                        stock_symbol=selected_stock,
+                        purchase_price=selected_stock.current_price,
+                        shares=shares,
+                        invested_amount=Decimal(roundup_amount)
+                    )
+                inv = Investment.objects.filter(user=request.user, stock_symbol=selected_stock).last()
+
+                InvestmentTransaction.objects.create(
+                    investment=inv,
+                    shares=shares,
+                    purchase_price=selected_stock.current_price,
+                    invested_amount=roundup_amount
+                )
+                wallet.add_transaction(
+                    amount=roundup_amount,
+                    transaction_type="Invest",
+                    account='Roundup'
+                )
             request.session['roundup_amount'] = float(roundup_amount)
             request.session['total_price'] = float(total_price)
             request.session['roundup_price'] = float(roundup_price)
@@ -150,8 +188,8 @@ def checkout(request):
 
         elif payment_method == 'stripe':
             pass
-
-    return render(request, 'shop/checkout.html')
+    stocks = Stock.objects.order_by('?')[:5]
+    return render(request, 'shop/checkout.html', {'stock_list': stocks})
 
 
 def success(request):
@@ -161,3 +199,7 @@ def success(request):
 
 def failed(request):
     return render(request, 'shop/failed.html')
+
+
+def orders(request):
+    return render(request, 'shop/order_list.html')

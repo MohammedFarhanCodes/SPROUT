@@ -14,4 +14,5 @@ urlpatterns = [
     path('payment/failed', views.failed, name="failed"),
     path('item_plus/<int:prod_id>', views.item_plus, name="item_plus"),
     path('item_minus/<int:prod_id>', views.item_minus, name="item_minus"),
+    path('order_list/', views.orders, name="order_list")
 ]

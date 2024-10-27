@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -69,4 +71,16 @@ def logoutView(request):
     return redirect('accounts:login')
 
 
+def update_settings(request):
+    if request.method == "POST":
+        pay_extra = request.POST.get('pay_extra')
+        pay_extra_for = request.POST.get('pay_extra_for')
+        p = request.user.userprofile
+
+        p.pay_extra = pay_extra
+        p.percentage = Decimal(request.POST.get('percentage'))
+
+        p.pay_extra_for = pay_extra_for
+        p.save()
+        return redirect(request.META.get('HTTP_REFERER'))
 

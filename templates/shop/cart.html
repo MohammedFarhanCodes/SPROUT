@@ -57,8 +57,9 @@
                                                 </button>
 
                                                 <div data-mdb-input-init class="form-outline">
-                                                    <input id="form1" min="0" name="quantity" value="{{ item.quantity }}" type="number"
-                                                           class="form-control text-center"/>
+                                                    <input id="form1" min="0" name="quantity"
+                                                           value="{{ item.quantity }}" type="number"
+                                                           class="form-control text-center" disabled/>
                                                 </div>
 
                                                 <button data-mdb-button-init data-mdb-ripple-init
@@ -118,10 +119,11 @@
                                 </li>
                             </ul>
                             {% if user.cart.items.exists %}
-                            <button type="button" data-mdb-button-init data-mdb-ripple-init
-                                    class="btn btn-dark btn-block" onclick="location.href=`{% url 'shop:checkout' %}`">
-                                Go to checkout
-                            </button>
+                                <button type="button" data-mdb-button-init data-mdb-ripple-init
+                                        class="btn btn-dark btn-block"
+                                        onclick="location.href=`{% url 'shop:checkout' %}`">
+                                    Go to checkout
+                                </button>
                             {% endif %}
                         </div>
                     </div>

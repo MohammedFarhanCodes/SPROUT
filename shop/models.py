@@ -78,6 +78,9 @@ class Order(models.Model):
             total += item.quantity * item.product.price
         return total
 
+    class Meta:
+        ordering = ['created_at']
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)

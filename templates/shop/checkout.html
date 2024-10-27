@@ -41,7 +41,8 @@
                             <div class="col-12">
                                 <label for="email" class="form-label">Email <span
                                         class="text-body-secondary">(Optional)</span></label>
-                                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+                                <input type="email" class="form-control" id="email" name="email"
+                                       value="{{ user.email }}">
                                 <div class="invalid-feedback">
                                     Please enter a valid email address for shipping updates.
                                 </div>
@@ -49,7 +50,8 @@
 
                             <div class="col-12">
                                 <label for="address" class="form-label">Address</label>
-                                <input type="text" class="form-control" id="address" name="address" placeholder="1234 Main St"
+                                <input type="text" class="form-control" id="address" name="address"
+                                       placeholder="1234 Main St"
                                        required>
                                 <div class="invalid-feedback">
                                     Please enter your shipping address.
@@ -58,7 +60,8 @@
 
                             <div class="col-12">
                                 <label for="address2" class="form-label">Address 2 <span class="text-body-secondary">(Optional)</span></label>
-                                <input type="text" class="form-control" name="address2" id="address2" placeholder="Apartment or suite">
+                                <input type="text" class="form-control" name="address2" id="address2"
+                                       placeholder="Apartment or suite">
                             </div>
 
                             <div class="col-md-5">
@@ -85,7 +88,7 @@
                                     Please provide a valid emirate.
                                 </div>
                             </div>
-                            
+
 
                         </div>
 
@@ -109,9 +112,89 @@
                         <div class="my-3">
                             <select name="payment_method" id="" class="form-select">
                                 <option value="stripe">Stripe</option>
-                                <option value="current">Current account (AED {{ user.wallet.investment_balance }})</option>
+                                <option value="current">Current account (AED {{ user.wallet.investment_balance }})
+                                </option>
                                 </option>
                             </select>
+                        </div>
+                        <div class="row mx-4">
+                            <div class="col-md-6">Pay extra:</div>
+                            <div class="col-md-6">
+                                <select name="pay_extra" class="form-select mb-2" id="pay_extra">
+                                    <option value="roundup_balance"
+                                            {% if user.userprofile.pay_extra == "roundup_balance" %}selected{% endif %}>
+                                        Roundup balance
+                                    </option>
+                                    <option value="fixed_percentage"
+                                            {% if user.userprofile.pay_extra == "fixed_percentage" %}selected{% endif %}>
+                                        Fixed percentage
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Percentage Label and Input -->
+                            <div class="col-md-6" id="percentage_label" style="display: none;">Percentage(%):</div>
+                            <div class="col-md-6" id="percentage_input" style="display: none;">
+                                <input type="number" name="percentage" class="form-control mb-2" min="0" max="100"
+                                       value="{{ user.userprofile.percentage }}">
+                            </div>
+
+                            <script>
+                                // Function to toggle the visibility of the percentage label and input
+                                function togglePercentageInput() {
+                                    const payExtraSelect = document.getElementById("pay_extra");
+                                    const percentageInput = document.getElementById("percentage_input");
+                                    const percentageLabel = document.getElementById("percentage_label");
+
+                                    if (payExtraSelect.value === "fixed_percentage") {
+                                        percentageLabel.style.display = "block";
+                                        percentageInput.style.display = "block";
+                                    } else {
+                                        percentageLabel.style.display = "none";
+                                        percentageInput.style.display = "none";
+                                    }
+                                }
+
+                                // Run the function on page load to check the initial state
+                                window.addEventListener("DOMContentLoaded", togglePercentageInput);
+
+                                // Add event listener for changes to the dropdown
+                                document.getElementById("pay_extra").addEventListener("change", togglePercentageInput);
+                            </script>
+
+                            <div class="col-md-6">Pay extra for:</div>
+                            <div class="col-md-6">
+                                <select name="pay_extra_for" class="form-select mb-2" id="payExtraSelect">
+                                    <option value="savings">Savings</option>
+                                    <option value="invest">Invest</option>
+                                </select>
+                            </div>
+
+                            <!-- Container for stock options, initially hidden -->
+                            <div class="col-md-12 mt-2" id="stockOptions" style="display: none;">
+                                <label>Select a stock to invest in:</label>
+                                {% for stock in stock_list %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="selected_stock"
+                                               id="stock{{ stock.id }}" value="{{ stock.id }}">
+                                        <label class="form-check-label" for="stock{{ stock.id }}">
+                                            {{ stock.name }} - {{ stock.symbol }} (Price: ${{ stock.current_price }})
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <script>
+                                document.getElementById("payExtraSelect").addEventListener("change", function () {
+                                    var stockOptions = document.getElementById("stockOptions");
+                                    if (this.value === "invest") {
+                                        stockOptions.style.display = "block";  // Show stock options
+                                    } else {
+                                        stockOptions.style.display = "none";   // Hide stock options
+                                    }
+                                });
+                            </script>
+
                         </div>
 
 
