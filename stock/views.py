@@ -1,13 +1,14 @@
 from decimal import Decimal
 
 from django.shortcuts import render, redirect
-
+from django.contrib.auth.decorators import login_required
 from wallet.models import Transaction
 from .utils import fetch_stock_list
 from .models import Stock, Investment, InvestmentTransaction
 import yfinance as yf
 
 
+@login_required(login_url='accounts:login')
 def stock_list(request):
     stocks = Stock.objects.all()
 
@@ -17,7 +18,7 @@ def stock_list(request):
     return render(request, 'stock/stock_list.html', context)
 
 
-# Fetch historical data for a stock (e.g., 'AAPL')
+@login_required(login_url='accounts:login')
 def get_stock_history(symbol, period="1mo"):
     stock = yf.Ticker(symbol)
     stock_history = stock.history(period=period)
@@ -25,6 +26,7 @@ def get_stock_history(symbol, period="1mo"):
     return stock_history
 
 
+@login_required(login_url='accounts:login')
 def stock_chart(request, symbol):
     # Fetch historical data for the stock
 
@@ -56,10 +58,12 @@ def stock_chart(request, symbol):
     return render(request, 'stock/stock chart.html', context)
 
 
+@login_required(login_url='accounts:login')
 def user_stocks(request):
     return render(request, 'stock/user_stocks.html')
 
 
+@login_required(login_url='accounts:login')
 def buy_stock(request):
     if request.method == "POST":
         amount = Decimal(request.POST.get('amount'))
@@ -69,19 +73,20 @@ def buy_stock(request):
             return redirect('stock:user_stocks')
         stock = Stock.objects.get(symbol=symbol)
         shares = Decimal(amount) / stock.current_price
-        temp = Investment.objects.filter(stock_symbol=stock)
+        temp = Investment.objects.filter(stock_symbol=symbol, user=request.user)
+
         if temp.exists():
             temp.first().buy_more_shares(amount, stock.current_price)
         else:
             Investment.objects.get_or_create(
                 user=request.user,
-                stock_symbol=stock,
+                stock_symbol=symbol,
                 purchase_price=stock.current_price,
                 shares=shares,
                 invested_amount=Decimal(amount)
             )
-        inv = Investment.objects.filter(user=request.user, stock_symbol=stock).last()
-
+        inv = Investment.objects.filter(user=request.user, stock_symbol=symbol).last()
+        print(inv)
         InvestmentTransaction.objects.create(
             investment=inv,
             shares=shares,
@@ -98,13 +103,14 @@ def buy_stock(request):
     return redirect('stock:user_stocks')
 
 
+@login_required(login_url='accounts:login')
 def sell_stock(request):
     if request.method == "POST":
         shares = Decimal(request.POST.get('shares'))
         symbol = request.POST.get('symbol')
 
         stock = Stock.objects.get(symbol=symbol)
-        temp = Investment.objects.filter(user=request.user, stock_symbol=stock)
+        temp = Investment.objects.filter(user=request.user, stock_symbol=symbol)
         amount = shares * stock.current_price
         if temp.exists():
             if temp.first().shares >= shares:

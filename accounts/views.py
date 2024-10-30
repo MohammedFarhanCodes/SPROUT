@@ -25,7 +25,7 @@ def loginView(request):
         # Handle successful or failed authentication
         if user:
             login(request, user)
-            return redirect('main:dashboard')
+            return redirect(request.META.get('HTTP_REFERER'))
         else:
             messages.error(request, 'Authentication Error')
             return redirect('accounts:login')

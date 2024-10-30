@@ -2,7 +2,7 @@ import math
 from decimal import Decimal
 
 from django.shortcuts import render, get_object_or_404, redirect
-
+from django.contrib.auth.decorators import login_required
 from stock.models import Stock, Investment, InvestmentTransaction
 from wallet.models import Wallet
 from .models import Product, Cart, CartItem, Order, OrderItem
@@ -41,10 +41,12 @@ def product(request, prod_id):
     return render(request, 'shop/product.html', context)
 
 
+@login_required(login_url='accounts:login')
 def cart(request):
     return render(request, 'shop/cart.html')
 
 
+@login_required(login_url='accounts:login')
 def add_to_cart(request, prod_id=None):
     # Unpack the tuple returned by get_or_create
     user_cart, created = Cart.objects.get_or_create(
@@ -88,12 +90,14 @@ def add_to_cart(request, prod_id=None):
     return JsonResponse({'error': 'Invalid request method.'})
 
 
+@login_required(login_url='accounts:login')
 def delete_cart_item(request, item_id):
     item = CartItem.objects.get(id=item_id, cart__user=request.user)
     item.delete()
     return redirect('shop:cart')
 
 
+@login_required(login_url='accounts:login')
 def item_plus(request, prod_id):
     item = CartItem.objects.get(id=prod_id, cart__user=request.user)
     item.quantity += 1
@@ -101,6 +105,7 @@ def item_plus(request, prod_id):
     return redirect(request.META.get('HTTP_REFERER'))
 
 
+@login_required(login_url='accounts:login')
 def item_minus(request, prod_id):
     item = CartItem.objects.get(id=prod_id, cart__user=request.user)
     item.quantity -= 1
@@ -110,6 +115,7 @@ def item_minus(request, prod_id):
     return redirect(request.META.get('HTTP_REFERER'))
 
 
+@login_required(login_url='accounts:login')
 def checkout(request):
     if request.method == 'POST':
         wallet = Wallet.objects.get(user=request.user)
@@ -201,5 +207,6 @@ def failed(request):
     return render(request, 'shop/failed.html')
 
 
+@login_required(login_url='accounts:login')
 def orders(request):
     return render(request, 'shop/order_list.html')

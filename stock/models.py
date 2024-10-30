@@ -18,7 +18,7 @@ class Stock(models.Model):
 
 class Investment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    stock_symbol = models.OneToOneField(Stock, on_delete=models.CASCADE)
+    stock_symbol = models.CharField(max_length=50, blank=True, null=True)
     shares = models.DecimalField(max_digits=10, decimal_places=5)
     purchase_price = models.DecimalField(max_digits=10, decimal_places=2)
     invested_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -26,7 +26,8 @@ class Investment(models.Model):
 
     @property
     def get_shares_value(self):
-        return f"{self.shares * self.stock_symbol.current_price:.2f}"
+        stock_symbol = Stock.objects.get(symbol=self.stock_symbol)
+        return f"{self.shares * stock_symbol.current_price:.2f}"
 
     def buy_more_shares(self, additional_amount, additional_price):
         additional_shares = additional_amount / additional_price
@@ -45,8 +46,9 @@ class Investment(models.Model):
         self.user.wallet.investment_balance += amount
         self.user.wallet.save()
         profit = (shares * current_price) - (shares * self.purchase_price)
+        stock_obj = Stock.objects.get(symbol=self.stock_symbol)
         Profit.objects.create(
-            stock=self.stock_symbol,
+            stock=stock_obj,
             user=self.user,
             amount=profit
         )
